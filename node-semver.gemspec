@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'npm-semver/version'
+require 'node-semver/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "npm-semver"
+  spec.name          = "node-semver"
   spec.version       = Semver::VERSION
   spec.authors       = ["marguerite"]
   spec.email         = ["i@marguerite.su"]
 
-  spec.summary       = %q{A Ruby implementation of the semver that nodejs package manager uses}
-  spec.description   = %q{Semver is a semantic versioning guideline. The implementation that npm uses is one of the best. Here's a Ruby implementation of it.}
-  spec.homepage      = "http://github.com/marguerite/npm-semver"
+  spec.summary       = %q{A Ruby implementation of the semver that NodeJS uses}
+  spec.description   = %q{Semver is a semantic versioning guideline. The implementation that NodeJS uses is one of the best. Here's a Ruby implementation of it.}
+  spec.homepage      = "http://github.com/marguerite/rubygem-node-semver"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
