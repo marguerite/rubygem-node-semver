@@ -1,5 +1,5 @@
 module Semver
-	class Ranges
+	class Range
 		def initialize(version)
 			@version = version
 		end
@@ -27,7 +27,7 @@ module Semver
 					version = fillup_x(@version)
 					parse_x(version)
 				else
-					Semver.valid(@version).nil? ? nil : ["="+@version]
+					Semver::Single.new(@version).valid.nil? ? nil : ["="+@version]
 				end
 			end
 		end
@@ -39,7 +39,7 @@ module Semver
 			arr.map! {|v| v.strip!}
 			range = []
 			arr.each do |item|
-				item_range = Semver::Ranges.new(item).parse
+				item_range = Semver::Range.new(item).parse
 				range << item_range
 			end
 			return range
@@ -71,7 +71,7 @@ module Semver
 			arr = version.split("\s")
 			range = []
 			arr.each do |item|
-				item_range = Semver::Ranges.new(item).parse
+				item_range = Semver::Range.new(item).parse
 				range = range + item_range
 			end
 			return range

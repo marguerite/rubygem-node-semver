@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+$:.push(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+
+require 'node-semver'
+require 'optparse'
+
+parser = OptionParser.new do |opts|
+	opts.banner = "Usage: node-semver [options]"
+	opts.separator "Test if version(s) satisfy the supplied range(s), and sort them."
+	opts.separator ""
+	opts.separator "Multiple versions or ranges may be supplied, unless increment option\nis specified. In that case, only a single version may be used, and\nit is incremented by the specified level"
+	opts.separator ""
+	opts.separator "Program exits successfully if any valid version satisfies all supplied\nranges, and prints all satisfying versions."
+	opts.separator ""
+	opts.separator "If no versions are valid, or ranges are not satisfied, then exits failure."
+	opts.separator ""
+	opts.separator "Versions are printed in ascending order, so supplying multiple versions\nto the utility will just sort them."
+
+	opts.separator ""
+	opts.separator "Specific Options:"
+
+	opts.on("-v", "--valid [version]", "Return the parsed semver version, or nil if it's not valid.") do |v|
+		puts Semver.valid(v)
+	end
+
+	opts.on("-c", "--clean [version]", "Strip off the leading \"v\" or \"=v\" characters, and the surrounding\n\t\t\t\t\s\s\s\s\swhitespaces or tabs. Unlike node version, we treat \"=1.2.3\" as\n\t\t\t\t\s\s\s\s\srange so no strip off of the single equal symbol.") do |v|
+		puts Semver.clean(v)
+	end
+
+	opts.on("--major [version]", "Return the major version number.") do |v|
+		puts Semver.major(v)
+	end
+
+	opts.on("--minor [version]", "Return the minor version number.") do |v|
+		puts Semver.minor(v)
+	end
+
+	opts.on("--patch [version]", "Return the patch version number.") do |v|
+		puts Semver.patch(v)
+	end
+
+	opts.separator ""
+	opts.separator "Common Options:"
+	opts.on_tail("-h", "--help", "Show this message") do
+		puts opts
+		exit
+	end
+
+	opts.on_tail("--version", "Show version") do
+		puts Semver::VERSION
+		exit
+	end
+end
+
+parser.parse!(ARGV)

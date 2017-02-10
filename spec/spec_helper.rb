@@ -1,4 +1,4 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require "npm-semver"
+require "node-semver"
 require "rspec"
 
