@@ -22,4 +22,48 @@ describe Semver do
 		expect(Semver.patch("1.2.3")).to eq(3)
 	end
 
+	it "can get prerelease" do
+		expect(Semver.prerelease("1.2.3-alpha.0")).to eq("alpha.0")
+	end
+
+	it "can get prerelease type" do
+		expect(Semver.prerelease_type("1.2.3-alpha.0")).to eq("alpha")
+	end
+
+	it "can get prerelease number" do
+		expect(Semver.prerelease_number("1.2.3-alpha.0")).to eq(0)
+	end
+
+	it "can increase major version" do
+		expect(Semver.inc("1.2.3-alpha.0","major")).to eq("2.2.3")
+	end
+
+	it "can increase minor version" do
+		expect(Semver.inc("1.2.3-alpha.0","minor")).to eq("1.3.3")
+	end
+
+	it "can increase patch version" do
+		expect(Semver.inc("1.2.3-alpha.0","patch")).to eq("1.2.4")
+	end
+
+	it "can increase premajor version" do
+		expect(Semver.inc("1.2.3-alpha.1","premajor")).to eq("2.2.3-alpha.0")
+	end
+
+	it "can increase preminor version" do
+		expect(Semver.inc("1.2.3-alpha.1","preminor")).to eq("1.3.3-alpha.0")
+	end
+
+	it "can increase prepatch version" do
+		expect(Semver.inc("1.2.3-alpha.1","prepatch")).to eq("1.2.4-alpha.0")
+	end
+
+	it "can increase prerelease version" do
+		expect(Semver.inc("1.2.3","prerelease")).to eq("1.2.4-alpha.0")
+	end
+
+	it "can increase prerelease version" do
+		expect(Semver.inc("1.2.3-alpha.1","prerelease")).to eq("1.2.3-alpha.2")
+	end
+
 end

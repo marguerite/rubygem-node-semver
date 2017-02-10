@@ -6,7 +6,7 @@ module Semver
 
 		def valid
 			v = clean
-			if v =~ /^[0-9]+\.[0-9]+\.[0-9]+(-)?((alpha|beta|rc)(\.)?[0-9]+)?(\+.*)?$/
+			if v =~ /^\d+\.\d+\.\d+(-)?([A-Za-z]+(\.)?\d+)?(\+.*)?$/
 				if [major.class,minor.class,patch.class].include? Bignum
 					raise Semver::InvalidVersion.new "One of the major/minor/patch numbers goes beyond Fixnum!"
 				elsif v.size > 256
@@ -21,7 +21,30 @@ module Semver
 
 		def inc(releasetype)
 			if VALIDRELEASETYPES.include?(releasetype)
-
+				version = valid
+				mainversion = version.gsub(/(\d+)((-|[A-Za-z]+).*$)/) { "#{$1}" }
+				pre = prerelease_number
+				pre_t = prerelease_type
+				case releasetype
+				when "major"
+					mainversion.gsub(/^(\d+)/) { "#{major + 1}" }
+				when "premajor"
+					mainversion.gsub(/^(\d+)/) { "#{major + 1}" } + "-alpha.0"
+				when "minor"
+					mainversion.gsub(/^(\d+)\.(\d+)/) { "#{$1}.#{minor + 1}" }
+				when "preminor"
+					mainversion.gsub(/^(\d+)\.(\d+)/) { "#{$1}.#{minor + 1}" } + "-alpha.0"
+				when "patch"
+					mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" }
+				when "prepatch"
+					mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
+				else # prerelease
+					if pre.nil?
+						mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
+					else
+						version.gsub(/(\d+)(-)?([A-Za-z]+(\.)?)(\d+)/) { "#{$1}#{$2}#{pre_t}#{$4}#{pre + 1}"}
+					end	
+				end
 			else
 				raise Semver::InvalidReleaseType
 			end
@@ -33,17 +56,44 @@ module Semver
 
 		def major
 			v = clean
-			/^([0-9]+)\..*$/.match(v)[1].to_i
+			/^(\d+)\..*$/.match(v)[1].to_i
 		end
 
 		def minor
 			v = clean
-			/^[0-9]+\.([0-9]+)\..*$/.match(v)[1].to_i
+			/^\d+\.(\d+)\..*$/.match(v)[1].to_i
 		end
 
 		def patch
 			v = clean
-			/^[0-9]+\.[0-9]+\.([0-9]+)(.*)?$/.match(v)[1].to_i
+			/^\d+\.\d+\.(\d+)(.*)?$/.match(v)[1].to_i
+		end
+
+		def prerelease
+			v = clean
+			if v =~ /\d+(-)?[A-Za-z]+(\.)?\d+(.*)?$/
+				/\d+(-)?([A-Za-z]+(\.)?\d+)(.*)?$/.match(v)[2]
+			else
+				nil
+			end
+		end
+
+		def prerelease_type
+			str = prerelease
+			if prerelease.nil?
+				nil
+			else
+				/([A-Za-z]+)/.match(str)[1]
+			end
+		end
+
+		def prerelease_number
+			str = prerelease
+			if prerelease.nil?
+				nil
+			else
+				/[A-Za-z](\.)?(\d+)/.match(str)[2].to_i
+			end
 		end
 
 		# comparision
