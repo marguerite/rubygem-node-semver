@@ -23,15 +23,15 @@ describe Semver do
 	end
 
 	it "can get prerelease" do
-		expect(Semver.prerelease("1.2.3-alpha.0")).to eq("alpha.0")
+		expect(Semver.pre("1.2.3-alpha.0")).to eq("alpha.0")
 	end
 
 	it "can get prerelease type" do
-		expect(Semver.prerelease_type("1.2.3-alpha.0")).to eq("alpha")
+		expect(Semver.pre_t("1.2.3-alpha.0")).to eq("alpha")
 	end
 
 	it "can get prerelease number" do
-		expect(Semver.prerelease_number("1.2.3-alpha.0")).to eq(0)
+		expect(Semver.pre_n("1.2.3-alpha.0")).to eq(0)
 	end
 
 	it "can increase major version" do

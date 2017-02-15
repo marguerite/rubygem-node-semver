@@ -41,15 +41,15 @@ parser = OptionParser.new do |opts|
 	end
 
 	opts.on("--pre [version]", "Return the prerelease part of the given version.") do |v|
-		puts Semver.prerelease(v)
+		puts Semver.pre(v)
 	end
 
 	opts.on("--pre_t [version]", "Return the prerelease type of the given version.") do |v|
-		puts Semver.prerelease_type(v)
+		puts Semver.pre_t(v)
 	end
 
 	opts.on("--pre_n [version]", "Return the prerelease number of the given version.") do |v|
-		puts Semver.prerelease_number(v)
+		puts Semver.pre_n(v)
 	end
 
 	opts.on("-i", "--increase [version],[releasetype]", Array, "Increase the version for certain releasetype.") do |arr|

@@ -10,4 +10,10 @@ module Semver
 			puts "Invalid Release Type, valid types: " + VALIDRELEASETYPES.join(',')
 		end
 	end
+
+	class InvalidComparator < StandardError
+		def initialize(comparator)
+			puts "Invalid Comparator: " + comparator
+		end
+	end
 end

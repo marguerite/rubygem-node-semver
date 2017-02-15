@@ -27,8 +27,17 @@ module Semver
 					version = fillup_x(@version)
 					parse_x(version)
 				else
-					Semver::Single.new(@version).valid.nil? ? nil : ["="+@version]
+					Semver.valid(@version).nil? ? nil : ["="+@version]
 				end
+			end
+		end
+
+		def validRange(raw=false)
+			range = parse
+			if range.instance_of?(Array)
+				raw ? range : @version
+			else
+				nil
 			end
 		end
 

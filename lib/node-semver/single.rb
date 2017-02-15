@@ -23,8 +23,8 @@ module Semver
 			if VALIDRELEASETYPES.include?(releasetype)
 				version = valid
 				mainversion = version.gsub(/(\d+)((-|[A-Za-z]+).*$)/) { "#{$1}" }
-				pre = prerelease_number
-				pre_t = prerelease_type
+				pre_num = pre_n
+				pre_type = pre_t
 				case releasetype
 				when "major"
 					mainversion.gsub(/^(\d+)/) { "#{major + 1}" }
@@ -39,10 +39,10 @@ module Semver
 				when "prepatch"
 					mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
 				else # prerelease
-					if pre.nil?
+					if pre_num.nil?
 						mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
 					else
-						version.gsub(/(\d+)(-)?([A-Za-z]+(\.)?)(\d+)/) { "#{$1}#{$2}#{pre_t}#{$4}#{pre + 1}"}
+						version.gsub(/(\d+)(-)?([A-Za-z]+(\.)?)(\d+)/) { "#{$1}#{$2}#{pre_type}#{$4}#{pre_num + 1}"}
 					end	
 				end
 			else
@@ -69,7 +69,7 @@ module Semver
 			/^\d+\.\d+\.(\d+)(.*)?$/.match(v)[1].to_i
 		end
 
-		def prerelease
+		def pre
 			v = clean
 			if v =~ /\d+(-)?[A-Za-z]+(\.)?\d+(.*)?$/
 				/\d+(-)?([A-Za-z]+(\.)?\d+)(.*)?$/.match(v)[2]
@@ -78,59 +78,22 @@ module Semver
 			end
 		end
 
-		def prerelease_type
-			str = prerelease
-			if prerelease.nil?
+		def pre_t
+			str = pre
+			if pre.nil?
 				nil
 			else
 				/([A-Za-z]+)/.match(str)[1]
 			end
 		end
 
-		def prerelease_number
-			str = prerelease
-			if prerelease.nil?
+		def pre_n
+			str = pre
+			if pre.nil?
 				nil
 			else
 				/[A-Za-z](\.)?(\d+)/.match(str)[2].to_i
 			end
 		end
-
-		# comparision
-
-		def gt(v1,v2)
-		end
-
-		def gte(v1,v2)
-		end
-
-		def lt(v1,v2)
-
-		end
-
-		def lte(v1,v2)
-		end
-
-		def eq(v1,v2)
-		end
-
-		def neq(v1,v2)
-		end
-
-		def cmp(v1, comparator, v2)
-		end
-
-		def compare(v1,v2)
-		end
-
-		def rcompare(v1,v2)
-
-		end
-
-		def diff(v1,v2)
-		end
-
-		private
-
 	end
 end
