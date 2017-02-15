@@ -123,7 +123,7 @@ describe Semver do
   end
 
   it "can call validRange function" do
-	  expect(Semver.validRange("^1.2.x")).to eq([">=1.2.0","<2.0.0"])
+	  expect(Semver.validRange("^1.2.x")).to eq("^1.2.x")
   end
 
 end

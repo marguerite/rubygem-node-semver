@@ -246,10 +246,3 @@ module Semver
         
 	end
 end
-require './semver.rb'
-require './exception.rb'
-require './single.rb'
-require './compare.rb'
-require './range.rb'
-
-p Semver::Satisfaction.new("1.2.3","3.0.0 || <1.2.3").outside("ltr")
