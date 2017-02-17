@@ -98,8 +98,3 @@ module Semver
 		end
 	end
 end
-
-require './version.rb'
-require './exception.rb'
-
-p Semver::Single.new(" >= 1.2.3 ").clean

@@ -108,6 +108,40 @@ module Semver
 		Semver::Comparison.new(v1,v2).diff
 	end
 
+	def sort(list)
+		while true do
+			flag = false
+			for i in 1..(list.size - 1) do
+				if Semver::Comparison.new(list[i - 1],list[i]).gt
+					tmp = list[i].dup
+					list[i] = list[i - 1].dup
+					list[i - 1] = tmp
+					flag = true
+				end
+			end
+			break if flag == false
+		end
+
+		return list
+	end
+
+	def rsort(list)
+		while true do
+			flag = false
+			for i in 1..(list.size - 1) do
+				if Semver::Comparison.new(list[i - 1],list[i]).lt
+					tmp = list[i]
+					list[i] = list[i - 1]
+					list[i - 1] = tmp
+					flag = true
+				end
+			end
+			break if flag == false
+		end
+
+		return list
+	end
+
 	def validRange(range)
 		Semver::Range.new(range).validRange
 	end
@@ -139,6 +173,6 @@ module Semver
 	end
 
 	module_function :valid,:clean,:major,:minor,:patch,:pre,:pre_t,:pre_n,:inc
-	module_function :gt,:gte,:lt,:lte,:eq,:neq,:cmp,:compare,:rcompare,:diff
+	module_function :gt,:gte,:lt,:lte,:eq,:neq,:cmp,:compare,:rcompare,:diff,:sort,:rsort
 	module_function :validRange,:satisfies,:maxSatisfying,:gtr,:ltr,:outside
 end

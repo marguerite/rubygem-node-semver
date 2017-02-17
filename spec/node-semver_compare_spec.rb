@@ -48,4 +48,12 @@ describe Semver do
 	it "can diff patch" do
 		expect(Semver.diff("1.2.3","1.2.4")).to eq("patch")
 	end
+
+	it "can sort versions" do
+		expect(Semver.sort(["0.0.3","0.0.6","0.0.4","0.0.1"])).to eq(["0.0.1","0.0.3","0.0.4","0.0.6"])
+	end
+
+	it "can reverse sort versions" do
+		expect(Semver.rsort(["0.0.3","0.0.6","0.0.4","0.0.1"])).to eq(["0.0.6","0.0.4","0.0.3","0.0.1"])
+	end
 end
