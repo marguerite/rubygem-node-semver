@@ -190,4 +190,3 @@ module Semver
 		end
 	end
 end
-

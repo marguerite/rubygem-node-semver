@@ -43,11 +43,11 @@ module Semver
 		def outside(hilo=nil)
 			case hilo
 			when ">"
-				Semver.gtr(@version,@range)
+				gtr
 			when "<"
-				Semver.ltr(@version,@range)
+				ltr
 			else # nil
-				if Semver.gtr(@version,@range) == false && Semver.ltr(@version,@range) == false
+				if gtr == false && ltr == false
 					false
 				else
 					true
@@ -149,7 +149,7 @@ module Semver
 			return max	
 		end
 
-		def basic_fit(v,r)
+		def fit(v,r)
 			regex = /(>=|>|<=|<|=)(\d+.*)/
 			comparator = regex.match(r)[1]
 			version = regex.match(r)[2]
@@ -160,7 +160,7 @@ module Semver
 			range = unify(r)
 			result = []
 			range.each do |item|
-				result << basic_fit(v,item) ? true : false
+				result << fit(v,item) ? true : false
 			end
 			result.include?(false) ? false : true
 		end
@@ -220,7 +220,7 @@ module Semver
 			end
 
 			unless gt_range.empty?
-				result << (fit?(v,lt_range) ? false : true)
+				result << (fit?(v,gt_range) ? false : true)
 			end
 
 			unless lt_range.empty?
