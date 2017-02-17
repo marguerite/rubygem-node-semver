@@ -123,7 +123,7 @@ module Semver
 				satisfied_versions << v
 			end
 		end
-		satisfied_versions.sort[-1]
+		satisfied_versions.empty? ? nil : satisfied_versions.sort[-1]
 	end
 
 	def gtr(version,range)
