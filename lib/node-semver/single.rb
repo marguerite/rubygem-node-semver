@@ -51,8 +51,17 @@ module Semver
 		end
 
 		def clean
+			# remove the surrounding whitespaces and tabs, and the leading "v"/"v="
 			v = @version.strip.gsub(/^(v|=v)?/,'')
-			v.gsub(/\s(\d.*)/) { "#{$1}" }
+			# remove the whitespace between comparator and the actual version
+			v.gsub(/\s+(\d+.*)/) { "#{$1}" }
+			# like "2.0.0-alpha", have prerelease type while have no prerelease number
+			# fill the number with 0
+			if v =~ /^(\d+|\.)+(-)?[A-Za-z]+$/
+				v += ".0"
+			end
+
+			return v
 		end
 
 		def major
