@@ -42,7 +42,7 @@ module Semver
 					if pre_num.nil?
 						mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
 					else
-						version.gsub(/(\d+)(-)?([A-Za-z]+(\.)?)(\d+)/) { "#{$1}#{$2}#{pre_type}#{$4}#{pre_num + 1}"}
+						version.gsub(/(\d+)(-)?([A-Za-z]+(\.)?)(\d+)/) { "#{$1}#{$2}#{pre_type}#{$4}#{pre_num + 1}" }
 					end	
 				end
 			else
@@ -51,7 +51,8 @@ module Semver
 		end
 
 		def clean
-			@version.strip.gsub(/^(v|=v)?/,'')
+			v = @version.strip.gsub(/^(v|=v)?/,'')
+			v.gsub(/\s(\d.*)/) { "#{$1}" }
 		end
 
 		def major
@@ -97,3 +98,8 @@ module Semver
 		end
 	end
 end
+
+require './version.rb'
+require './exception.rb'
+
+p Semver::Single.new(" >= 1.2.3 ").clean
