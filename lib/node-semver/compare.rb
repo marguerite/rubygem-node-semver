@@ -139,7 +139,7 @@ module Semver
 				# we only compare prerelease when main are the same
 				# released version is greater than prerelease one
 				1
-			elsif prev2.nil? && ! prev2.nil?
+			elsif prev2.nil? && ! prev1.nil?
 				-1
 			else
 				# Alphabetically, a < b < r
