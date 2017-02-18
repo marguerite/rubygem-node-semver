@@ -15,7 +15,13 @@ module Semver
 					v.gsub(/\+.*$/,'') # the build metadata is not a capturing group.
 				end
 			else
-				nil
+				# special treatment for dateformat "0.9.0-1.2.3" which is actually not valid,
+				# but has been included in npm registry
+				if v =~ /\d+-\d+/
+					v.gsub(/-.*$/,'') # strip the meaningless "-1.2.3"
+				else
+					nil
+				end
 			end
 		end
 
@@ -57,7 +63,7 @@ module Semver
 			v.gsub(/\s+(\d+.*)/) { "#{$1}" }
 			# like "2.0.0-alpha", have prerelease type while have no prerelease number
 			# fill the number with 0
-			if v =~ /^(\d+|\.)+(-)?[A-Za-z]+$/
+			if v =~ /\d+(-)?[A-Za-z]+$/
 				v += ".0"
 			end
 
