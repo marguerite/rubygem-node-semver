@@ -88,8 +88,8 @@ module Semver
 
 		def parse_caret(version)
 			orig = version.dup
-			version = fillup(version)
-			regex = /(.)\.(.)\.(.).*/.match(version)
+			version = fillup(version).sub("^","")
+			regex = /(.*)\.(.*)\.(.*).*/.match(version)
 			h = {:major=>regex[1],:minor=>regex[2],:patch=>regex[3]}
 			bit_to_up = ""
 
@@ -120,7 +120,7 @@ module Semver
 			if up == "0.0.0" && fillup?(version)
 				up = "0.1.0"
 			end
-			bottom = version.sub("^","").sub("x","0")
+			bottom = version.sub("x","")
 			range = [">=" + bottom,"<" + up]
 			return range
 		end
@@ -128,7 +128,7 @@ module Semver
 		def parse_tilde(version)
 			orig = version.dup
 			version = fillup(version).sub("~","").sub("x","0")
-			regex = /(.+)\.(.+)\.(.+).*/.match(version)
+			regex = /(.*)\.(.*)\.(.*).*/.match(version)
 			h = {:major=>regex[1],:minor=>regex[2],:patch=>regex[3]}
 			bottom = version
 			up_index = 0
@@ -151,7 +151,7 @@ module Semver
 
 		def parse_x(version)
 			version = fillup(version)
-			regex = /(.)\.(.)\.(.)/.match(version)
+			regex = /(.*)\.(.*)\.(.*)/.match(version)
 			h = {:major=>regex[1],:minor=>regex[2],:patch=>regex[3]}
 			bottom = version.gsub("x","0").gsub("*","0")
 
