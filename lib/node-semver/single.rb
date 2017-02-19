@@ -15,10 +15,20 @@ module Semver
 					v.gsub(/\+.*$/,'') # the build metadata is not a capturing group.
 				end
 			else
-				# special treatment for dateformat "0.9.0-1.2.3" which is actually not valid,
-				# but has been included in npm registry
-				if v =~ /\d+-\d+/
+				# special treatments: those are actually not valid, but has been included in npm registry
+				#                     because of historic reasons
+				# dateformat "0.9.0-1.2.3"
+				if v =~ /\d+-\d+\./
 					v.gsub(/-.*$/,'') # strip the meaningless "-1.2.3"
+				# readable-stream "1.0.26-1", which is actually "1.0.27-alpha.1"
+				elsif v =~ /\d+-\d+$/
+					regex = /(\d+)-.*$/.match(v)
+					bump = (regex[1].to_i + 1).to_s
+					prerelease = v.gsub(/^.*-/,'')
+					v.gsub(/(#{regex[1]})(\.\d+)?-.*/) { "#{bump}#{$2}-alpha.#{prerelease}" }
+				# glob "2.0.7-bindist-testing", which is actually "2.0.7-alpha.1"
+				elsif v =~ /\d+-([A-Za-z]|-)+$/
+					v.gsub(/-.*$/,'-alpha.1')
 				else
 					nil
 				end
@@ -35,18 +45,18 @@ module Semver
 				when "major"
 					mainversion.gsub(/^(\d+)/) { "#{major + 1}" }
 				when "premajor"
-					mainversion.gsub(/^(\d+)/) { "#{major + 1}" } + "-alpha.0"
+					mainversion.gsub(/^(\d+)/) { "#{major + 1}" } + "-alpha.1"
 				when "minor"
 					mainversion.gsub(/^(\d+)\.(\d+)/) { "#{$1}.#{minor + 1}" }
 				when "preminor"
-					mainversion.gsub(/^(\d+)\.(\d+)/) { "#{$1}.#{minor + 1}" } + "-alpha.0"
+					mainversion.gsub(/^(\d+)\.(\d+)/) { "#{$1}.#{minor + 1}" } + "-alpha.1"
 				when "patch"
 					mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" }
 				when "prepatch"
-					mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
+					mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.1"
 				else # prerelease
 					if pre_num.nil?
-						mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.0"
+						mainversion.gsub(/^(\d+)\.(\d+)\.(\d+)/) { "#{$1}.#{$2}.#{patch + 1}" } + "-alpha.1"
 					else
 						version.gsub(/(\d+)(-)?([A-Za-z]+(\.)?)(\d+)/) { "#{$1}#{$2}#{pre_type}#{$4}#{pre_num + 1}" }
 					end	
@@ -64,7 +74,7 @@ module Semver
 			# like "2.0.0-alpha", have prerelease type while have no prerelease number
 			# fill the number with 0
 			if v =~ /\d+(-)?[A-Za-z]+$/
-				v += ".0"
+				v += ".1"
 			end
 
 			return v
