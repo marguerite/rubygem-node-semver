@@ -153,9 +153,9 @@ module Semver
 			version = fillup(version)
 			regex = /(.*)\.(.*)\.(.*)/.match(version)
 			h = {:major=>regex[1],:minor=>regex[2],:patch=>regex[3]}
-			bottom = version.gsub("x","0").gsub("*","0")
+			bottom = version.gsub(/x|X|\*/,"0")
 
-			up_index = h.values.index{|e| e =~ /x|\*/}
+			up_index = h.values.index(/x|X|\*/)
 			bit_to_up = h.keys[up_index - 1]
 			h[bit_to_up] = (h[bit_to_up].to_i + 1).to_s
 
