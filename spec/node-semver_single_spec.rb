@@ -47,19 +47,19 @@ describe Semver do
 	end
 
 	it "can increase premajor version" do
-		expect(Semver.inc("1.2.3-alpha.1","premajor")).to eq("2.2.3-alpha.0")
+		expect(Semver.inc("1.2.3-alpha.1","premajor")).to eq("2.2.3-alpha.1")
 	end
 
 	it "can increase preminor version" do
-		expect(Semver.inc("1.2.3-alpha.1","preminor")).to eq("1.3.3-alpha.0")
+		expect(Semver.inc("1.2.3-alpha.1","preminor")).to eq("1.3.3-alpha.1")
 	end
 
 	it "can increase prepatch version" do
-		expect(Semver.inc("1.2.3-alpha.1","prepatch")).to eq("1.2.4-alpha.0")
+		expect(Semver.inc("1.2.3-alpha.1","prepatch")).to eq("1.2.4-alpha.1")
 	end
 
 	it "can increase prerelease version" do
-		expect(Semver.inc("1.2.3","prerelease")).to eq("1.2.4-alpha.0")
+		expect(Semver.inc("1.2.3","prerelease")).to eq("1.2.4-alpha.1")
 	end
 
 	it "can increase prerelease version" do
