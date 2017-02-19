@@ -127,10 +127,10 @@ module Semver
 
 		def parse_tilde(version)
 			orig = version.dup
-			version = fillup(version)
-			regex = /(.)\.(.)\.(.).*/.match(version)
+			version = fillup(version).sub("~","").sub("x","0")
+			regex = /(.+)\.(.+)\.(.+).*/.match(version)
 			h = {:major=>regex[1],:minor=>regex[2],:patch=>regex[3]}
-			bottom = version.sub("~","")
+			bottom = version
 			up_index = 0
 			if orig.split(".").size < 2
 				up_index = 1
