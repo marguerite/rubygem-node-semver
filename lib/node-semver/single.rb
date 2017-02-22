@@ -29,6 +29,9 @@ module Semver
 				# glob "2.0.7-bindist-testing", which is actually "2.0.7-alpha.1"
 				elsif v =~ /\d+-([A-Za-z]|-)+$/
 					v.gsub(/-.*$/,'-alpha.1')
+				# validate-npm-package-license "1.0.0-prerelease-1", which is actually "1.0.0-prerelease.1"
+				elsif v =~ /\d+(-)?[A-Za-z]+-\d+/
+					v.gsub(/([A-Za-z]+)-(\d+)/) { "#{$1}.#{$2}" }
 				else
 					nil
 				end
