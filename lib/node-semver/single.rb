@@ -32,6 +32,9 @@ module Semver
 				# validate-npm-package-license "1.0.0-prerelease-1", which is actually "1.0.0-prerelease.1"
 				elsif v =~ /\d+(-)?[A-Za-z]+-\d+/
 					v.gsub(/([A-Za-z]+)-(\d+)/) { "#{$1}.#{$2}" }
+				# babylon "7.0.0-beta.0-ranges"
+				elsif v =~ /\d+(-)?[A-Za-z]+\.\d+(-)?[A-Za-z]+/
+					v.gsub(/\.1$/,'').gsub(/(-)?[A-Za-z]+$/,'')
 				else
 					nil
 				end
