@@ -10,7 +10,7 @@ describe Semver do
   end
 
   it 'can maxsatisfying' do
-    expect(Semver.maxSatisfying(['1.0.0', '1.0.1', '1.0.2'], '0.0.9 || >=1.0.0 <2.0.0')).to eq('1.0.2')
+    expect(Semver.max_satisfying(['1.0.0', '1.0.1', '1.0.2'], '0.0.9 || >=1.0.0 <2.0.0')).to eq('1.0.2')
   end
 
   it 'can gtr a range' do
