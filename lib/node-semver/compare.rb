@@ -44,7 +44,7 @@ module Semver
       when '!='
         neq
       else
-        raise InvalidComparator, comparator
+        raise InvalidComparator, "Invalid Comparator: " + comparator
       end
     end
 
