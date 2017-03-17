@@ -30,10 +30,10 @@ module Semver
       end
     end
 
-    def valid_range(raw = false)
+    def valid_range
       range = parse
       raise 'Not a range' unless range.instance_of?(Array)
-      raw ? range : @version
+      range
     end
 
     private

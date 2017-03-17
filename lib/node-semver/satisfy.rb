@@ -2,7 +2,7 @@ module Semver
   class Satisfaction
     def initialize(version, range)
       @version = Semver.valid(version)
-      @range = Semver::Range.new(range).valid_range(true)
+      @range = Semver::Range.new(range).valid_range
     end
 
     def satisfy
