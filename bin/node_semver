@@ -2,104 +2,104 @@
 
 $LOAD_PATH.push(File.expand_path(File.dirname(__FILE__) + '/../lib'))
 
-require 'node-semver'
+require 'node_semver'
 require 'optparse'
 
 parser = OptionParser.new do |opts|
-  opts.banner = 'Usage: node-semver [options]'
+  opts.banner = 'Usage: node_semver [options]'
   opts.separator ''
   opts.separator 'Specific Options:'
 
   opts.on('--valid version', "Return the parsed semver version, or nil if it's not valid.") do |v|
-    puts Semver.valid(v)
+    puts NodeSemver.valid(v)
   end
 
   opts.on('--clean version', 'Strip off the leading "v" or "=v" characters, and the surrounding whitespaces or tabs. Unlike node version, we treat "=1.2.3" as range so no strip off of the single equal symbol.') do |v|
-    puts Semver.clean(v)
+    puts NodeSemver.clean(v)
   end
 
   opts.on('--major version', 'Return the major version number.') do |v|
-    puts Semver.major(v)
+    puts NodeSemver.major(v)
   end
 
   opts.on('--minor version', 'Return the minor version number.') do |v|
-    puts Semver.minor(v)
+    puts NodeSemver.minor(v)
   end
 
   opts.on('--patch version', 'Return the patch version number.') do |v|
-    puts Semver.patch(v)
+    puts NodeSemver.patch(v)
   end
 
   opts.on('--pre version', 'Return the prerelease part of the given version.') do |v|
-    puts Semver.pre(v)
+    puts NodeSemver.pre(v)
   end
 
   opts.on('--pre_t version', 'Return the prerelease type of the given version.') do |v|
-    puts Semver.pre_t(v)
+    puts NodeSemver.pre_t(v)
   end
 
   opts.on('--pre_n version', 'Return the prerelease number of the given version.') do |v|
-    puts Semver.pre_n(v)
+    puts NodeSemver.pre_n(v)
   end
 
   opts.on('--increment version,releasetype', Array, 'Increase the version for certain releasetype.') do |arr|
-    puts Semver.inc(arr[0], arr[1])
+    puts NodeSemver.inc(arr[0], arr[1])
   end
 
   opts.on('--gt v1,v2', Array, 'Return true if v1 is greater than v2') do |arr|
-    puts Semver.gt(arr[0], arr[1])
+    puts NodeSemver.gt(arr[0], arr[1])
   end
 
   opts.on('--gte v1,v2', Array, 'Return true if v1 is greater than or equal to v2') do |arr|
-    puts Semver.gte(arr[0], arr[1])
+    puts NodeSemver.gte(arr[0], arr[1])
   end
 
   opts.on('--lt v1,v2', Array, 'Return true if v1 is less than v2') do |arr|
-    puts Semver.lt(arr[0], arr[1])
+    puts NodeSemver.lt(arr[0], arr[1])
   end
 
   opts.on('--lte v1,v2', Array, 'Return true if v1 is less than or equal to v2') do |arr|
-    puts Semver.lte(arr[0], arr[1])
+    puts NodeSemver.lte(arr[0], arr[1])
   end
 
   opts.on('--eq v1,v2', Array, 'Return true if v1 is equal to v2') do |arr|
-    puts Semver.eq(arr[0], arr[1])
+    puts NodeSemver.eq(arr[0], arr[1])
   end
 
   opts.on('--neq v1,v2', Array, 'The opposite of eq') do |arr|
-    puts Semver.neq(arr[0], arr[1])
+    puts NodeSemver.neq(arr[0], arr[1])
   end
 
   opts.on('--cmp v1,comparator,v2', Array, "Pass in a comparison string, and it'll call the corresponding function above") do |arr|
-    puts Semver.cmp(arr[0], arr[1], arr[2])
+    puts NodeSemver.cmp(arr[0], arr[1], arr[2])
   end
 
   opts.on('--compare v1,v2', Array, 'Return 1,0,-1 if v1 is greater than/equal to/less than v2') do |arr|
-    puts Semver.compare(arr[0], arr[1])
+    puts NodeSemver.compare(arr[0], arr[1])
   end
 
   opts.on('--rcompare v1,v2', Array, 'The reverse of compare') do |arr|
-    puts Semver.rcompare(arr[0], arr[1])
+    puts NodeSemver.rcompare(arr[0], arr[1])
   end
 
   opts.on('--diff v1,v2', Array, 'Returns difference between two versions by the release type') do |arr|
-    puts Semver.diff(arr[0], arr[1])
+    puts NodeSemver.diff(arr[0], arr[1])
   end
 
   opts.on('--sort v1,v2,...,vN', Array, 'Return versions in ascending order') do |arr|
-    puts Semver.sort(arr)
+    puts NodeSemver.sort(arr)
   end
 
   opts.on('--rsort v1,v2,...,vN', Array, 'Return versions in descending order') do |arr|
-    puts Semver.rsort(arr)
+    puts NodeSemver.rsort(arr)
   end
 
   opts.on('--validrange range', "Return the valid range or null if it's not valid") do |range|
-    puts Semver.valid_range(range)
+    puts NodeSemver.valid_range(range)
   end
 
   opts.on('--satisfies version,range', Array, 'Return true if the version satisfies the range') do |arr|
-    puts Semver.satisfies(arr[0], arr[1])
+    puts NodeSemver.satisfies(arr[0], arr[1])
   end
 
   opts.on('--maxsatisfying v1,v2,...,range', Array, 'Return the highest version in the list that satisfies the range, or nil if none of them do') do |arr|
@@ -108,19 +108,19 @@ parser = OptionParser.new do |opts|
     (0..arr.size - 2).each do |i|
       versions << i
     end
-    puts Semver.max_satisfying(versions, range)
+    puts NodeSemver.max_satisfying(versions, range)
   end
 
   opts.on('--gtr version,range', Array, 'Return true if version is greater than all the versions possible in the range') do |arr|
-    puts Semver.gtr(arr[0], arr[1])
+    puts NodeSemver.gtr(arr[0], arr[1])
   end
 
   opts.on('--ltr version,range', Array, 'Return true if version is less than all the versions possible in the range') do |arr|
-    puts Semver.ltr(arr[0], arr[1])
+    puts NodeSemver.ltr(arr[0], arr[1])
   end
 
   opts.on('--outside version,range,hilo', Array, 'Return true if version is outside the bounds of the range in either the high or low direction (hilo)') do |arr|
-    puts Semver.outside(arr[0], arr[1], arr[2])
+    puts NodeSemver.outside(arr[0], arr[1], arr[2])
   end
 
   opts.separator ''
@@ -131,7 +131,7 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on_tail('--version', 'Show version') do
-    puts Semver::VERSION
+    puts NodeSemver::VERSION
     exit
   end
 end

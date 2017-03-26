@@ -1,4 +1,4 @@
-module Semver
+module NodeSemver
   class Range
     def initialize(version)
       @version = version
@@ -26,7 +26,7 @@ module Semver
         version = fillup_x(@version)
         parse_x(version)
       else
-        Semver.valid(@version).nil? ? nil : ['=' + @version]
+        NodeSemver.valid(@version).nil? ? nil : ['=' + @version]
       end
     end
 
@@ -43,7 +43,7 @@ module Semver
       arr.map!(&:strip!)
       range = []
       arr.each do |item|
-        item_range = Semver::Range.new(item).parse
+        item_range = NodeSemver::Range.new(item).parse
         range << item_range
       end
       range
@@ -75,7 +75,7 @@ module Semver
       arr = version.split("\s")
       range = []
       arr.each do |item|
-        item_range = Semver::Range.new(item).parse
+        item_range = NodeSemver::Range.new(item).parse
         range += item_range
       end
       range

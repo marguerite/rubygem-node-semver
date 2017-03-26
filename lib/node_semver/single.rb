@@ -1,4 +1,4 @@
-module Semver
+module NodeSemver
   class Single
     def initialize(version)
       @version = version
@@ -8,9 +8,9 @@ module Semver
       v = clean
       if v =~ /^\d+\.\d+\.\d+(-)?([A-Za-z]+(\.)?\d+)?(\+.*)?$/
         if [major.class, minor.class, patch.class].include? Integer
-          raise Semver::InvalidVersion, 'One of the major/minor/patch numbers goes beyond Fixnum!'
+          raise NodeSemver::InvalidVersion, 'One of the major/minor/patch numbers goes beyond Fixnum!'
         elsif v.size > 256
-          raise Semver::InvalidVersion, 'Version longer than 256 characters!'
+          raise NodeSemver::InvalidVersion, 'Version longer than 256 characters!'
         else
           v.gsub(/\+.*$/, '') # the build metadata is not a capturing group.
         end
@@ -38,7 +38,7 @@ module Semver
     end
 
     def inc(releasetype)
-      raise Semver::InvalidReleaseType unless VALIDRELEASETYPES.include?(releasetype)
+      raise NodeSemver::InvalidReleaseType unless VALIDRELEASETYPES.include?(releasetype)
       version = valid
       mainversion = version.gsub(/(\d+)((-|[A-Za-z]+).*$)/) { Regexp.last_match(1).to_s }
       pre_num = pre_n

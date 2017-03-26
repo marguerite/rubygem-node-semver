@@ -1,8 +1,8 @@
-module Semver
+module NodeSemver
   class Comparison
     def initialize(v1, v2)
-      @v1 = Semver.valid(v1)
-      @v2 = Semver.valid(v2)
+      @v1 = NodeSemver.valid(v1)
+      @v2 = NodeSemver.valid(v2)
     end
 
     def gt
@@ -44,7 +44,7 @@ module Semver
       when '!='
         neq
       else
-        raise InvalidComparator, "Invalid Comparator: " + comparator
+        raise InvalidComparator, 'Invalid Comparator: ' + comparator
       end
     end
 
@@ -61,19 +61,19 @@ module Semver
     def diff
       if eq
         nil
-      elsif Semver.pre_t(@v1).nil? && Semver.pre_t(@v2).nil?
-        if Semver.major(@v1) != Semver.major(@v2)
+      elsif NodeSemver.pre_t(@v1).nil? && NodeSemver.pre_t(@v2).nil?
+        if NodeSemver.major(@v1) != NodeSemver.major(@v2)
           'major'
-        elsif Semver.minor(@v1) != Semver.minor(@v2)
+        elsif NodeSemver.minor(@v1) != NodeSemver.minor(@v2)
           'minor'
         else
-          Semver.patch(@v1) != Semver.patch(@v2) ? 'patch' : nil
+          NodeSemver.patch(@v1) != NodeSemver.patch(@v2) ? 'patch' : nil
         end
-      elsif Semver.major(@v1) != Semver.major(@v2)
+      elsif NodeSemver.major(@v1) != NodeSemver.major(@v2)
         'premajor'
-      elsif Semver.minor(@v1) != Semver.minor(@v2)
+      elsif NodeSemver.minor(@v1) != NodeSemver.minor(@v2)
         'preminor'
-      elsif Semver.patch(@v1) != Semver.patch(@v2)
+      elsif NodeSemver.patch(@v1) != NodeSemver.patch(@v2)
         'prepatch'
       elsif compare_pre.zero?
         nil
@@ -97,7 +97,7 @@ module Semver
     end
 
     def compare_main
-      r = compare_num(Semver.major(@v1), Semver.major(@v2)) || compare_num(Semver.minor(@v1), Semver.minor(@v2)) || compare_num(Semver.patch(@v1), Semver.patch(@v2))
+      r = compare_num(NodeSemver.major(@v1), NodeSemver.major(@v2)) || compare_num(NodeSemver.minor(@v1), NodeSemver.minor(@v2)) || compare_num(NodeSemver.patch(@v1), NodeSemver.patch(@v2))
       r.nil? ? 0 : r
     end
 
@@ -106,17 +106,17 @@ module Semver
         1
       elsif compare_pretype < 0
         -1
-      elsif Semver.pre_n(@v1).nil? && Semver.pre_n(@v2).nil?
+      elsif NodeSemver.pre_n(@v1).nil? && NodeSemver.pre_n(@v2).nil?
         0
       else
-        r = compare_num(Semver.pre_n(@v1), Semver.pre_n(@v2))
+        r = compare_num(NodeSemver.pre_n(@v1), NodeSemver.pre_n(@v2))
         r.nil? ? 0 : r
       end
     end
 
     def compare_pretype
-      prev1 = Semver.pre_t(@v1)
-      prev2 = Semver.pre_t(@v2)
+      prev1 = NodeSemver.pre_t(@v1)
+      prev2 = NodeSemver.pre_t(@v2)
       if prev1.nil? && prev2.nil?
         # both have no Pretype, equal
         0

@@ -1,8 +1,8 @@
-module Semver
+module NodeSemver
   class Satisfaction
     def initialize(version, range)
-      @version = Semver.valid(version)
-      @range = Semver::Range.new(range).valid_range
+      @version = NodeSemver.valid(version)
+      @range = NodeSemver::Range.new(range).valid_range
     end
 
     def satisfy
@@ -94,7 +94,7 @@ module Semver
       else
         max_gt = max(gt_arr)
         max_gte = max(gte_arr)
-        unified_arr << if Semver.gte(max_gt, max_gte)
+        unified_arr << if NodeSemver.gte(max_gt, max_gte)
                          '>=' + max_gte
                        else
                          '>' + max_gt
@@ -111,7 +111,7 @@ module Semver
       else
         max_lt = max(lt_arr)
         max_lte = max(lte_arr)
-        unified_arr << if Semver.gte(max_lte, max_lt)
+        unified_arr << if NodeSemver.gte(max_lte, max_lt)
                          '<=' + max_lte
                        else
                          '<' + max_lt
@@ -138,7 +138,7 @@ module Semver
       max = ''
       arr.uniq.each do |item|
         prev = (arr.index(item) - 1 < 0 ? 0 : arr.index(item) - 1)
-        max = item if Semver.gte(item, arr[prev])
+        max = item if NodeSemver.gte(item, arr[prev])
       end
 
       max
@@ -148,7 +148,7 @@ module Semver
       regex = /(>=|>|<=|<|=)(\d+.*)/
       comparator = regex.match(r)[1]
       version = regex.match(r)[2]
-      Semver.cmp(v, comparator, version)
+      NodeSemver.cmp(v, comparator, version)
     end
 
     def fit?(v, r)
@@ -171,7 +171,7 @@ module Semver
       unless eq_range.empty?
         eq_range.each do |i|
           # if it's in/lower than the range, then it can't be greater than the range.
-          result << Semver.gt(v, i.delete('='))
+          result << NodeSemver.gt(v, i.delete('='))
         end
       end
 
@@ -188,7 +188,7 @@ module Semver
           result << false
         else
           eq_range.each do |i|
-            result << Semver.gt(v, i.delete('='))
+            result << NodeSemver.gt(v, i.delete('='))
           end
         end
       end
@@ -206,7 +206,7 @@ module Semver
       unless eq_range.empty?
         eq_range.each do |i|
           # if it's in/greater than the range, then it can't be lower than the range.
-          result << Semver.lt(v, i.delete('=')) ? true : false
+          result << NodeSemver.lt(v, i.delete('='))
         end
       end
 
@@ -223,7 +223,7 @@ module Semver
           result << false
         else
           eq_range.each do |i|
-            result << Semver.gt(v, i.delete('=')) ? true : false
+            result << NodeSemver.gt(v, i.delete('='))
           end
         end
       end
