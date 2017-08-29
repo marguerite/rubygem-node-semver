@@ -44,7 +44,7 @@ module NodeSemver
       when '!='
         neq
       else
-        raise InvalidComparator, 'Invalid Comparator: ' + comparator
+        raise NodeSemver::Exception, 'Invalid Comparator: ' + comparator
       end
     end
 

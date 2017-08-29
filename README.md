@@ -1,5 +1,5 @@
-## A Ruby implementation of the Semver that NodeJS uses
+## A Ruby implementation of the semantic version parser used by npm
 
-This project is a split from nodejs-packaging.
+[![Code Climate](https://codeclimate.com/github/marguerite/rubygem-node-semver/badges/gpa.svg)](https://codeclimate.com/github/marguerite/rubygem-node-semver)
 
-I try to make everything standard as rubygem thus easy packaging in openSUSE.
+This project re-implements the semantic version parser used by npm in ruby.

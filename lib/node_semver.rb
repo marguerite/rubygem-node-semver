@@ -2,52 +2,32 @@ require 'node_semver/compare.rb'
 require 'node_semver/exception.rb'
 require 'node_semver/range.rb'
 require 'node_semver/satisfy.rb'
-require 'node_semver/single.rb'
+require 'node_semver/instance.rb'
 require 'node_semver/version.rb'
 
 module NodeSemver
-  def self.valid(v)
-    NodeSemver::Single.new(v).valid
+  extend self
+  def method_missing(reltype, v)
+    super unless RELTYPES.include?(reltype.to_s)
+    NodeSemver::Instance.new(v).send(reltype)
   end
 
-  def self.clean(v)
-    raise "You can't clean an invalid version" if valid(v).nil?
-    NodeSemver::Single.new(v).clean
+  def respond_to_missing(reltype)
+    RELTYPES.include?(reltype.to_s) || super
   end
+end
 
-  def self.major(v)
-    raise "You can't get major number for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).major
-  end
+module NodeSemver
+  class << self
+    def valid(v)
+      NodeSemver::Instance.new(v).valid
+    end
 
-  def self.minor(v)
-    raise "You can't get minor number for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).minor
-  end
+    alias_method :clean, :valid
 
-  def self.patch(v)
-    raise "You can't get patch number for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).patch
-  end
-
-  def self.pre(v)
-    raise "You can't get prerelease string for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).pre
-  end
-
-  def self.pre_t(v)
-    raise "You can't get prerelease type for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).pre_t
-  end
-
-  def self.pre_n(v)
-    raise "You can't get prerelease number for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).pre_n
-  end
-
-  def self.inc(v, releasetype)
-    raise "You can't increase version for invalid version!" if valid(v).nil?
-    NodeSemver::Single.new(v).inc(releasetype)
+    def self.inc(v, reltype)
+      NodeSemver::Instance.new(v).inc(reltype)
+    end
   end
 
   def self.gt(v1, v2)
