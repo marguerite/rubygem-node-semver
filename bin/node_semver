@@ -31,19 +31,11 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on('--pre version', 'Return the prerelease part of the given version.') do |v|
-    puts NodeSemver.pre(v)
+    puts NodeSemver.prerelease(v)
   end
 
-  opts.on('--pre_t version', 'Return the prerelease type of the given version.') do |v|
-    puts NodeSemver.pre_t(v)
-  end
-
-  opts.on('--pre_n version', 'Return the prerelease number of the given version.') do |v|
-    puts NodeSemver.pre_n(v)
-  end
-
-  opts.on('--increment version,releasetype', Array, 'Increase the version for certain releasetype.') do |arr|
-    puts NodeSemver.inc(arr[0], arr[1])
+  opts.on('--increment version,releasetype,preid', Array, 'Increase the version for certain releasetype.') do |arr|
+    puts NodeSemver.inc(arr[0], arr[1], arr[2])
   end
 
   opts.on('--gt v1,v2', Array, 'Return true if v1 is greater than v2') do |arr|

@@ -1,6 +1,7 @@
 module NodeSemver
   # parse a standalone single version like '1.0.0-beta.1'
   class Instance
+    include Comparable
     attr_reader :version, :major, :minor, :patch, :prerelease
 
     def initialize(version)
@@ -15,7 +16,30 @@ module NodeSemver
       version
     end
 
-    def inc(reltype)
+    def main_ver
+      version.sub(/-.*$/, '')
+    end
+
+    def <=>(other)
+      if main_ver == other.main_ver &&
+         [prerelease, other.prerelease].include?(nil)
+        compare_prerelease(self, other)
+      else
+        version <=> other.version
+      end
+    end
+
+    def -(other)
+      return if self == other
+      if prerelease.nil? && other.prerelease.nil?
+        main_diff(self, other)
+      else
+        return 'prerelease' if main.call.nil?
+        'pre' + main_diff(self, other)
+      end
+    end
+
+    def inc(reltype, preid)
       raise NodeSemver::Exception, 'Invalid reltype' unless RELTYPES.include?(reltype)
       if reltype == 'prerelease'
         unless @prerelease.nil?
@@ -31,7 +55,7 @@ module NodeSemver
       end
       version = inc_version_by_type(@version, reltype)
       return version if indicator.nil?
-      version + '-alpha.1'
+      version + '-' + preid + '.0'
     end
 
     private
@@ -40,12 +64,12 @@ module NodeSemver
       str = '(\d+)\.'
       level = %w[major minor patch].index(type)
       regex = (str * (level + 1)).sub!(/\\\.$/, '')
-      version.sub(/^#{regex}/) do
+      version.sub!(/^#{regex}/) do
         repl = ''
         level.times { |i| repl << Regexp.last_match(i + 1) + '.' }
         repl << (send(type).to_i + 1).to_s
         repl
-      end
+      end.sub(/-.*$/, '')
     end
 
     def tidy(version)
@@ -54,7 +78,7 @@ module NodeSemver
       # remove the whitespace between comparator and the actual version
       v.gsub(/\s+(\d+.*)/) { Regexp.last_match(1) }
       # eg "2.0.0-alpha", have pre type while no pre num
-      v += '.1' if v =~ /\d+\.\d+-?[A-Za-z]+$/
+      v += '.0' if v =~ /\d+\.\d+-?[A-Za-z]+$/
       v
     end
 
@@ -71,16 +95,16 @@ module NodeSemver
     def dirty_parse(version)
       # dateformat '0.9.0-1.2.3', strip meaningless '-1.2.3'
       version.sub!(/-.*$/, '') if version =~ /\d+-\d+\./
-      # readable-stream '1.0.26-1', is actually '1.0.27-alpha.1'
+      # readable-stream '1.0.26-1', is actually '1.0.27-prerelease.1'
       if version =~ /(\d+)-(\d+)$/
         patch_num = Regexp.last_match(1)
         pre_num = Regexp.last_match(2)
         version.sub!(/#{patch_num}-.*$/) do
-          "#{patch_num.to_i + 1}-alpha.#{pre_num}"
+          "#{patch_num.to_i + 1}-prerelease.#{pre_num}"
         end
       end
-      # glob '2.0.7-bindist-testing', is actually '2.0.7-alpha.1'
-      version.sub!(/-.*$/, '-alpha.1') if version =~ /\d+-[A-Za-z]+-[A-Za-z]+$/
+      # glob '2.0.7-bindist-testing', is actually '2.0.7-prerelease.0'
+      version.sub!(/-.*$/, '-prerelease.0') if version =~ /\d+-[A-Za-z]+-[A-Za-z]+$/
       # validate-npm-package-license '1.0.0-prerelease-1', is actually '1.0.0-prerelease.1'
       if version =~ /\d+(-)?[A-Za-z]+-\d+/
         version.sub!(/([A-Za-z]+)-(\d+)/) do
@@ -92,6 +116,21 @@ module NodeSemver
         version.sub!(Regexp.last_match(1), '')
       end
       normal_parse(version)
+    end
+
+    def compare_prerelease(v1, v2)
+      return 0 if v1.prerelease == v2.prerelease
+      v1.prerelease.nil? ? 1 : -1
+    end
+
+    def main_diff(v1, v2)
+      if v1.major != v2.major
+        'major'
+      elsif v1.minor != v2.minor
+        'minor'
+      elsif v1.patch != v2.patch
+        'patch'
+      end
     end
   end
 end

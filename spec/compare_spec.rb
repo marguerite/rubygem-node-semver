@@ -50,12 +50,10 @@ describe NodeSemver do
   end
 
   it 'can sort versions' do
-    arr = ['0.0.3', '0.0.6', '0.0.4', '0.0.1']
-    expect(NodeSemver.sort(arr)).to eq(['0.0.1', '0.0.3', '0.0.4', '0.0.6'])
+    expect(NodeSemver.sort('0.0.3', '0.0.6', '0.0.4', '0.0.1')).to eq(['0.0.1', '0.0.3', '0.0.4', '0.0.6'])
   end
 
   it 'can reverse sort versions' do
-    arr = ['0.0.3', '0.0.6', '0.0.4', '0.0.1']
-    expect(NodeSemver.rsort(arr)).to eq(['0.0.6', '0.0.4', '0.0.3', '0.0.1'])
+    expect(NodeSemver.rsort('0.0.3', '0.0.6', '0.0.4', '0.0.1')).to eq(['0.0.6', '0.0.4', '0.0.3', '0.0.1'])
   end
 end
