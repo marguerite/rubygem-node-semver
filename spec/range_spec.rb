@@ -124,4 +124,8 @@ describe NodeSemver do
   it 'can call valid_range function' do
     expect(NodeSemver.valid_range('^1.2.x')).to eq(['>=1.2.0', '<2.0.0'])
   end
+
+  it 'can valid range >= 1.0.0' do
+    expect(NodeSemver.valid_range('>= 1.0.0')).to eq(['>=1.0.0'])
+  end
 end

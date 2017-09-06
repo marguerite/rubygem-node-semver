@@ -26,7 +26,7 @@ module NodeSemver
         version = fillup_x(@version)
         parse_x(version)
       else
-        NodeSemver.valid(@version).nil? ? nil : ['=' + @version]
+        NodeSemver::Instance.new(@version).valid.nil? ? nil : ['=' + @version]
       end
     end
 
@@ -73,6 +73,11 @@ module NodeSemver
 
     def parse_whitespace(version)
       arr = version.split("\s")
+      # normally this is to parse ">=1.0.0 <2.0.0", but sometimes
+      # ">= 1.0.0" goes here too
+      if arr.size == 2 && !arr.reject {|i| i =~ /\d+/}.empty?
+        return NodeSemver::Range.new(arr[0] + arr[1]).parse
+      end
       range = []
       arr.each do |item|
         item_range = NodeSemver::Range.new(item).parse
