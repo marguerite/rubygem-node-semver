@@ -74,12 +74,12 @@ module NodeSemver
 
     def tidy(version)
       # remove the surrounding spaces, and the leading 'v' or '=v'
-      v = Regexp.last_match(1).strip if version =~ /=?v?(\d+.*)$/
+      version = Regexp.last_match(1) if version.strip =~ /^=?v?(\d+.*)$/
       # remove the whitespace between comparator and the actual version
-      v.gsub(/\s+(\d+.*)/) { Regexp.last_match(1) }
-      # eg "2.0.0-alpha", have pre type while no pre num
-      v += '.0' if v =~ /\d+\.\d+-?[A-Za-z]+$/
-      v
+      version = version.gsub(/(.*)\s+(\d+.*)/) { Regexp.last_match(1) + Regexp.last_match(2) }
+      # eg '2.0.0-alpha', have pre type but no pre num
+      version += '.0' if version =~ /\d+\.\d+-?[A-Za-z]+$/
+      version
     end
 
     def normal_parse(version)
