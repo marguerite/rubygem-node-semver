@@ -10,11 +10,10 @@ module NodeSemver
         result = false
         @range.each do |r|
           if fit?(@version, r)
-            result = true
-            break
+            return true
           end
         end
-        result
+	result
       else
         fit?(@version, @range)
       end
@@ -147,6 +146,7 @@ module NodeSemver
     def fit(v, r)
       regex = /(>=|>|<=|<|=)(\d+.*)/
       comparator = regex.match(r)[1]
+      comparator = '==' if comparator == '='
       version = regex.match(r)[2]
       NodeSemver.cmp(v, comparator, version)
     end
@@ -155,9 +155,9 @@ module NodeSemver
       range = unify(r)
       result = []
       range.each do |item|
-        result << fit(v, item) ? true : false
+        result << fit(v, item)
       end
-      result.include?(false) ? false : true
+      !result.include?(false)
     end
 
     def single_gtr(v, r)
