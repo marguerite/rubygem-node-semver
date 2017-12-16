@@ -72,6 +72,11 @@ module NodeSemver
     end
 
     def parse_whitespace(version)
+      # Make sure number are like >=1.0.0 not like >= 1.0.0
+      version.gsub!("> ", ">")
+      version.gsub!(">= ", ">=")
+      version.gsub!("< ", "<")
+
       arr = version.split("\s")
       # normally this is to parse ">=1.0.0 <2.0.0", but sometimes
       # ">= 1.0.0" goes here too
