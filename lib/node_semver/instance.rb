@@ -25,7 +25,18 @@ module NodeSemver
          [prerelease, other.prerelease].include?(nil)
         compare_prerelease(self, other)
       else
-        version <=> other.version
+        # Sometimes Space ship just messes things up
+        # For example '9.12.0 < 10.0.0' result is incorrect 
+        # So try to solve that with comparing first number
+        # If it's smaller we just move on and return that
+        # If that it not working then back to spaceship check
+        local_ver = version.split(".")
+        local_other_ver = other.version.split(".")
+        if (Integer(local_ver[0]) < Integer(local_other_ver[0]))
+           Integer(local_ver[0]) <=> Integer(local_other_ver[0])
+        else
+           version <=> other.version
+        end
       end
     end
 
