@@ -1,32 +1,18 @@
 module NodeSemver
   class Range
     def initialize(version)
-      @version = version
+      @version = if version.eql?('*') || version.empty?
+                   '>=0.0.0'
+                 else
+                   version
+                 end
     end
 
     def parse
-      if @version.index('||')
-        parse_pipe(@version)
-      elsif @version.index("\s-\s")
-        parse_hyphen(@version)
-      elsif @version.index("\s")
-        parse_whitespace(@version)
-      elsif @version.start_with?('^')
-        parse_caret(@version)
-      elsif @version.start_with?('~')
-        parse_tilde(@version)
-      elsif @version == '*' || @version.empty?
-        ['>=0.0.0']
-      elsif @version.index(/x|X|\*/)
-        parse_x(@version)
-      elsif @version[0] =~ />|<|=/
-        version = fillup?(@version) ? fillup(@version) : @version
-        [version]
-      elsif @version.split('.').size < 3
-        version = fillup_x(@version)
-        parse_x(version)
+      if @version =~ /\|\||[^-]\s[^-]/
+        multi_range(@version)
       else
-        NodeSemver::Instance.new(@version).valid.nil? ? nil : ['=' + @version]
+        single_range(@version)
       end
     end
 
@@ -38,148 +24,125 @@ module NodeSemver
 
     private
 
-    def parse_pipe(version)
-      arr = version.split('||')
-      arr.map!(&:strip!)
-      range = []
-      arr.each do |item|
-        item_range = NodeSemver::Range.new(item).parse
-        range << item_range
-      end
-      range
+    def multi_range(version)
+      version =~ /\|\|/ ? parse_pipe(version) : parse_whitespace(version)
     end
 
-    def parse_hyphen(version)
-      arr = version.split('-')
-      arr.map!(&:strip!)
-      bottom_str = fillup?(arr[0]) ? fillup(arr[0]) : arr[0]
-      bottom = '>=' + bottom_str
-
-      up = ''
-      if fillup?(arr[1])
-        version = arr[1].dup
-        version = fillup(version)
-        regex = /(.)\.(.)\.(.)/.match(version)
-        h = { major: regex[1], minor: regex[2], patch: regex[3] }
-        index = arr[1].split('.').size - 1
-        bit_to_up = h.keys[index]
-        h[bit_to_up] = (h[bit_to_up].to_i + 1).to_s
-        up = '<' + h.values[0] + '.' + h.values[1] + '.' + h.values[2]
+    def single_range(version)
+      if version =~ /\s-\s/
+        parse_hyphen(version)
+      elsif version.start_with?('^')
+        parse_caret(version)
+      elsif version.start_with?('~')
+        parse_tilde(version)
+      elsif version =~ /x|X|\*/
+        parse_x(version)
       else
-        up = '<=' + arr[1]
+        version_completion(version)
       end
-      [bottom, up]
+    end
+
+    def version_completion(version)
+      if version =~ /^(>|<|=)/
+        [fillup(version)]
+      elsif version.split('.').size < 3
+        parse_x(version)
+      else
+        NodeSemver::Instance.new(version).valid.nil? ? nil : ['=' + version]
+      end
+    end
+
+    def parse_pipe(version)
+      version.split('||').map!(&:strip!).map! do |v|
+        NodeSemver::Range.new(v).parse
+      end
     end
 
     def parse_whitespace(version)
-      arr = version.split("\s")
-      # normally this is to parse ">=1.0.0 <2.0.0", but sometimes
-      # ">= 1.0.0" goes here too
-      if arr.size == 2 && !arr.reject {|i| i =~ /\d+/}.empty?
-        return NodeSemver::Range.new(arr[0] + arr[1]).parse
+      version.gsub(/(>|<|=)\s/, '\s').split("\s")
+             .map! do |v|
+        NodeSemver::Range.new(v).parse[0]
       end
-      range = []
-      arr.each do |item|
-        item_range = NodeSemver::Range.new(item).parse
-        range += item_range
+    end
+
+    def parse_hyphen(version)
+      version.split('-').each_with_index.map! do |v, i|
+        v.strip!
+        arr = v.split('.')
+        if i.eql?(0)
+          '>=' + fillup(v)
+        elsif arr.size < 3
+          arr[-1] = arr[-1].to_i + 1
+          '<' + fillup(arr.join('.'))
+        else
+          '<=' + v
+        end
       end
-      range
     end
 
     def parse_caret(version)
-      orig = version.dup
-      version = fillup(version).sub('^', '')
-      regex = /(\d+)\.(\d+|x|X|\*)\.(\d+|x|X|\*).*/.match(version)
-      h = { major: regex[1], minor: regex[2], patch: regex[3] }
-      bit_to_up = ''
-
-      if h.values.include?('x')
-        bit_to_up = if h.values[0] == '0'
-                      h.keys[h.values.index('x') - 1]
-                    else
-                      h.keys[0]
-                    end
+      arr = version.sub!('^', '').split('.')[0..2]
+      if arr.size < 3
+        index = (arr.size - 1).dup
+        index -= 1 if arr[index] =~ /x|X/
+        version.sub!(/x|X/, '0')
+        low = '>=' + fillup(version)
+        high = '<' + fillup(up(arr, index, true))
       else
-        nonzero = {}
-        h.each { |k, v| nonzero[k] = v if v.to_i > 0 }
-        bit_to_up = if nonzero.empty? # everything is 0, refers to "^0.0"
-                      h.keys[3 - orig.split('.').size]
-                    else
-                      nonzero.keys[0]
-                    end
+        bit, index = non_zero_with_index(arr)
+        index -= 1 if index == arr.size - 1 && bit =~ /x|X/
+        version.sub!(/x|X/, '0')
+        low = '>=' + version
+        high = '<' + up(arr, index, true)
       end
-      h[bit_to_up] = (h[bit_to_up].to_i + 1).to_s
-      up_index = h.keys.index(bit_to_up) + 1
-      if 3 - up_index > 0
-        (up_index..2).each do |i|
-          h[h.keys[i]] = '0'
-        end
-      end
+      [low, high]
+    end
 
-      up = h.values[0] + '.' + h.values[1] + '.' + h.values[2]
-      up = '0.1.0' if up == '0.0.0' && fillup?(version)
-      bottom = version.sub('x', '0')
-      range = ['>=' + bottom, '<' + up]
-      range
+    def non_zero_with_index(array)
+      array.each_with_index do |v, i|
+        return v, i unless v.eql?('0')
+      end
+    end
+
+    def up(array, index, caret = false)
+      array.each_with_index.map do |i, j|
+        i = 0 if j > index
+        i = 0 if caret && i =~ /x|X/
+        i = i.to_i + 1 if j == index
+        i
+      end.join('.')
     end
 
     def parse_tilde(version)
-      orig = version.dup
-      version = fillup(version).sub('~', '').sub('x', '0')
-      # 1.2.3-beta.2
-      regex = /(\d+)\.(\d+|x|X|\*)\.(\d+|x|X|\*).*/.match(version)
-      h = { major: regex[1], minor: regex[2], patch: regex[3] }
-      bottom = version
-
-      up_index = 0
-      if orig.split('.').size < 2
-        up_index = 1
-        h[:major] = (h[:major].to_i + 1).to_s
-      else
-        up_index = 2
-        h[:minor] = (h[:minor].to_i + 1).to_s
-      end
-
-      (up_index..2).each do |i|
-        h[h.keys[i]] = '0'
-      end
-
-      up = h.values[0] + '.' + h.values[1] + '.' + h.values[2]
-      range = ['>=' + bottom, '<' + up]
-      range
+      v = fillup(version.sub!('~', ''))
+      arr = v.split('.')[0..2]
+      high = if arr[1].eql?('0')
+               up(arr, 0)
+             else
+               up(arr, 1)
+             end
+      ['>=' + v, '<' + high]
     end
 
     def parse_x(version)
-      version = fillup(version)
-      regex = /(\d+)\.(\d+|x|X|\*)\.(\d+|x|X|\*)/.match(version)
-      h = { major: regex[1], minor: regex[2], patch: regex[3] }
-      bottom = version.gsub(/x|X|\*/, '0')
-
-      up_index = h.values.index { |e| e =~ /x|X|\*/ }
-      bit_to_up = h.keys[up_index - 1]
-      h[bit_to_up] = (h[bit_to_up].to_i + 1).to_s
-
-      (up_index..2).each do |i|
-        h[h.keys[i]] = '0'
-      end
-      up = h.values[0] + '.' + h.values[1] + '.' + h.values[2]
-      range = ['>=' + bottom, '<' + up]
-      range
+      arr = version.sub('X', 'x').split('.')
+      low = fillup(version.sub(/x|X/, '0'))
+      index = if version =~ /x|X/
+                arr.find_index('x') - 1
+              else
+                arr.size - 1
+              end
+      high = fillup(up(arr, index))
+      ['>=' + low, '<' + high]
     end
 
     def fillup(version)
       # fillup 1.0 to 1.0.0
-      bits_to_fillup = 3 - version.split('.').size
-      bits_to_fillup.times { version << '.0' } if bits_to_fillup > 0
+      size = version.split('.').size
+      return version unless size < 3
+      num = 3 - size
+      num.times { version << '.0' } if num > 0
       version
-    end
-
-    def fillup?(version)
-      3 - version.split('.').size > 0 ? true : false
-    end
-
-    def fillup_x(version)
-      3 - version.split('.').size == 2 ? version + '.x.0' : version + '.x'
     end
   end
 end
