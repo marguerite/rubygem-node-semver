@@ -1,4 +1,3 @@
-require 'node_semver/exception'
 require 'node_semver/range'
 require 'node_semver/satisfy'
 require 'node_semver/instance'
