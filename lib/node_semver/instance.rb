@@ -5,7 +5,7 @@ module NodeSemver
     attr_reader :version, :major, :minor, :patch, :prerelease
 
     def initialize(version)
-      v = tidy(version)
+      v = tidy(version) || '0.0.0'
       tmp = normal_parse(v)
       tmp = dirty_parse(v) if tmp.nil?
       @version, @major, @minor, @patch, *@prerelease = tmp
@@ -73,6 +73,7 @@ module NodeSemver
     end
 
     def tidy(version)
+      return if version.nil?
       # remove the surrounding spaces, and the leading 'v' or '=v'
       version = Regexp.last_match(1) if version.strip =~ /^=?v?(\d+.*)$/
       # remove the whitespace between comparator and the actual version
