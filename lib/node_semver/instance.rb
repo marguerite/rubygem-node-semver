@@ -5,7 +5,13 @@ module NodeSemver
     attr_reader :version, :major, :minor, :patch, :prerelease
 
     def initialize(version)
-      v = tidy(version)
+      # There is small but real possibility that upstream
+      # doesn't have version number. It's smaller problem
+      # to have something than crash
+      v = '0.0.0'
+      if !version.nil?
+         v = tidy(version)
+      end
       tmp = normal_parse(v)
       tmp = dirty_parse(v) if tmp.nil?
       @version, @major, @minor, @patch, *@prerelease = tmp
