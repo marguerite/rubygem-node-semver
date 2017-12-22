@@ -6,7 +6,6 @@ module NodeSemver
 
     def initialize(version)
       v = tidy(version)
-p v
       tmp = normal_parse(v)
       tmp = dirty_parse(v) if tmp.nil?
       @version, @major, @minor, @patch, *@prerelease = tmp
