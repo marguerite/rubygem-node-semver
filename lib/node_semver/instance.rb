@@ -16,17 +16,10 @@ module NodeSemver
       version
     end
 
-    def main_ver
-      version.sub(/-.*$/, '')
-    end
-
     def <=>(other)
-      if main_ver == other.main_ver &&
-         [prerelease, other.prerelease].include?(nil)
-        compare_prerelease(self, other)
-      else
-        version <=> other.version
-      end
+      main = compare_main(other) 
+      return main unless main.zero?
+      compare_prerelease(other)
     end
 
     def -(other)
@@ -59,6 +52,24 @@ module NodeSemver
     end
 
     private
+
+    def compare_main(other)
+      spaceship(major, other.major) ||
+      spaceship(minor, other.minor) ||
+      spaceship(patch, other.patch) ||
+      0
+    end
+
+    def spaceship(v1, v2)
+      stat = v1.to_i <=> v2.to_i
+      stat.zero? ? false : stat
+    end
+
+    def compare_prelease(other)
+      return 0 if prerelease == other.prerelease
+      prerelease.nil? ? -1 : 1
+      prerelease[0] <=> other.prerelease[0]
+    end
 
     def inc_version_by_type(version, type)
       str = '(\d+)\.'
@@ -117,11 +128,6 @@ module NodeSemver
         version.sub!(Regexp.last_match(1), '')
       end
       normal_parse(version)
-    end
-
-    def compare_prerelease(v1, v2)
-      return 0 if v1.prerelease == v2.prerelease
-      v1.prerelease.nil? ? 1 : -1
     end
 
     def main_diff(v1, v2)
