@@ -13,6 +13,10 @@ module NodeSemver
     end
 
     def valid
+      raise 'Not numeric' unless numeric?
+      raise 'Version overflows' if overflow?
+      raise 'Negative version' if negative?
+      raise 'Version too long' if version.size > 256
       version
     end
 
@@ -77,6 +81,30 @@ module NodeSemver
       0
     end
 
+    def overflow?
+      max = 4611686018427387903
+      major.to_i > max ||
+      minor.to_i > max ||
+      patch.to_i > max ||
+      !prerelease.nil? && prerelease[1].to_i > max ||
+      false
+    end
+
+    def negative?
+      major.to_i < 0 ||
+      minor.to_i < 0 ||
+      patch.to_i < 0 ||
+      !prerelease.nil? && prerelease[1].to_i < 0 ||
+      false
+    end
+
+    def numeric?
+      stat = major =~ /\d+/ &&
+             minor =~ /\d+/ &&
+             patch =~ /\d+/
+      stat += prerelease[1] =~ /\d+/ unless prerelease.nil?
+    end
+
     def inc_version_by_type(version, type)
       str = '(\d+)\.'
       level = %w[major minor patch].index(type)
@@ -101,7 +129,7 @@ module NodeSemver
     end
 
     def normal_parse(version)
-      r = /^(\d+)\.(\d+)\.(\d+)(-?([A-Za-z]+)\.?(\d+))?(\+.*)?$/
+      r = /^(.*?)\.(.*?)\.(.*?)(-?([A-Za-z]+)\.?(.*?))?(\+.*)?$/
       return unless version =~ r
       m = version.match(r)
       # the build metadata is not a capturing group
