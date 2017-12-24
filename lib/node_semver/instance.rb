@@ -17,7 +17,7 @@ module NodeSemver
     end
 
     def <=>(other)
-      main = compare_main(other) 
+      main = compare_main(other)
       return main unless main.zero?
       compare_prerelease(other)
     end
@@ -65,10 +65,16 @@ module NodeSemver
       stat.zero? ? false : stat
     end
 
-    def compare_prelease(other)
-      return 0 if prerelease == other.prerelease
+    def compare_prerelease(other)
+      return 0 if prerelease.nil? && other.prerelease.nil?
+      # ['alpha', '3']
+      return spaceship(prerelease[0][0],other.prerelease[0][0]) || prerelease[1] <=> other.prerelease[1] unless prerelease.nil? || other.prerelease.nil?
       prerelease.nil? ? -1 : 1
-      prerelease[0] <=> other.prerelease[0]
+    end
+
+    def comparable?(other)
+      return if !compare_main(other).zero? && !prerelease.nil? && !other.prerelease.nil?
+      0
     end
 
     def inc_version_by_type(version, type)

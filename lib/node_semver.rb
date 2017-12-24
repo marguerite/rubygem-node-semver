@@ -32,12 +32,17 @@ module NodeSemver
     end
 
     def cmp(v1, comparator, v2)
-      NodeSemver::Instance.new(v1).send(comparator,
-                                        NodeSemver::Instance.new(v2))
+      v1 = NodeSemver::Instance.new(v1)
+      v2 = NodeSemver::Instance.new(v2)
+      return false if v1.send(:comparable?, v2)
+      v1.send(comparator, v2)
     end
 
     def compare(v1, v2)
-      NodeSemver::Instance.new(v1) <=> NodeSemver::Instance.new(v2)
+      v1 = NodeSemver::Instance.new(v1)
+      v2 = NodeSemver::Instance.new(v2)
+      return if v1.send(:comparable?, v2)
+      v1 <=> v2
     end
 
     def rcompare(v1, v2)
