@@ -5,7 +5,7 @@ module NodeSemver
       @range = NodeSemver::Range.new(range).valid_range
     end
 
-    %i[satisfy gtr ltr outside].each do |m|
+    %i[satisfy gtr ltr].each do |m|
       define_method m do
         if @range[0].instance_of?(Array)
           @range.map! do |r|
@@ -25,8 +25,9 @@ module NodeSemver
       end.include?(true)
     end
 
-    def fit?(version, range)
+    def fit?(version, range, reverse=false)
       comparator, other = split_comparator(range)
+      comparator = opposite(comparator) if reverse
       comparator = '==' if comparator.eql?('=')
       NodeSemver.cmp(version, comparator, other)
     end
@@ -38,22 +39,24 @@ module NodeSemver
 
     def outside?(version, range)
       out = 0
-      range.each_with_index do |r, i|
-        comparator, other = split_comparator(r)
-        comparator = opposite(comparator)
-        sym = NodeSemver.cmp(version, comparator, other)
+      range.each do |r|
+        sym = fit?(version, r, true)
         next unless sym
-        out = if i.zero?
+	comparator, other = split_comparator(r)
+        out = if comparator =~ />/
                 -1
-              elsif i == 1
+              elsif comparator =~ /</
                 1
+	      else
+                # the equal case
+                NodeSemver::Instance.new(version) <=> NodeSemver::Instance.new(other)
               end
       end
       out
     end
 
     def opposite(comparator)
-      hash = { '>' => '<=', '>=' => '<', '<' => '>=', '<=' => '>' }
+      hash = { '>' => '<=', '>=' => '<', '<' => '>=', '<=' => '>', '=' => '!=' }
       hash[comparator]
     end
 

@@ -4,7 +4,7 @@ module NodeSemver
       @version = if version.eql?('*') || version.empty?
                    '>=0.0.0'
                  else
-                   version
+		   version.gsub(/(>|<|=)\s/, '\1')
                  end
     end
 
@@ -59,14 +59,13 @@ module NodeSemver
     end
 
     def parse_whitespace(version)
-      version.gsub(/(>|<|=)\s/, '\s').split("\s")
-             .map! do |v|
+      version.split("\s").map! do |v|
         NodeSemver::Range.new(v).parse[0]
       end
     end
 
     def parse_hyphen(version)
-      version.split('-').each_with_index.map! do |v, i|
+      version.split('-').each_with_index.map do |v, i|
         v.strip!
         arr = v.split('.')
         if i.eql?(0)
@@ -125,9 +124,11 @@ module NodeSemver
     end
 
     def parse_x(version)
-      arr = version.sub('X', 'x').split('.')
-      low = fillup(version.sub(/x|X/, '0'))
-      index = if version =~ /x|X/
+      # '1.2.*'
+      version = version.sub!(/X|\*/, 'x') || version
+      arr = version.split('.')
+      low = fillup(version.sub('x', '0'))
+      index = if version =~ /x/
                 arr.find_index('x') - 1
               else
                 arr.size - 1

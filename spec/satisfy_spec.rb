@@ -30,6 +30,6 @@ describe NodeSemver do
   end
 
   it 'can detect outside of range' do
-    expect(NodeSemver.outside('1.2.3', '>=1.0.0 <1.1.0 || 1.2.2')).to eq(true)
+    expect(NodeSemver.outside('1.2.3', '>=1.0.0 <1.1.0 || 1.2.2', '>')).to eq(true)
   end
 end

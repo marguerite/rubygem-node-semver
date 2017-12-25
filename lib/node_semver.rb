@@ -34,14 +34,14 @@ module NodeSemver
     def cmp(v1, comparator, v2)
       v1 = NodeSemver::Instance.new(v1)
       v2 = NodeSemver::Instance.new(v2)
-      return false if v1.send(:comparable?, v2)
+      return false if v1.send(:comparable?, v2).nil?
       v1.send(comparator, v2)
     end
 
     def compare(v1, v2)
       v1 = NodeSemver::Instance.new(v1)
       v2 = NodeSemver::Instance.new(v2)
-      return if v1.send(:comparable?, v2)
+      return if v1.send(:comparable?, v2).nil?
       v1 <=> v2
     end
 
@@ -86,7 +86,8 @@ module NodeSemver
     NodeSemver::Satisfaction.new(version, range).ltr
   end
 
-  def self.outside(version, range, hilo = nil)
-    NodeSemver::Satisfaction.new(version, range).outside(hilo)
+  def self.outside(version, range, hilo)
+    raise 'hilo must be > or <' unless %w(> <).include?(hilo)
+    hilo.eql?('>') ? NodeSemver.gtr(version, range) : NodeSemver.ltr(version, range)
   end
 end

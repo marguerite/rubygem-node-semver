@@ -103,6 +103,7 @@ module NodeSemver
              minor =~ /\d+/ &&
              patch =~ /\d+/
       stat += prerelease[1] =~ /\d+/ unless prerelease.nil?
+      stat.zero?
     end
 
     def inc_version_by_type(version, type)
