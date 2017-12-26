@@ -20,6 +20,14 @@ module NodeSemver
     end
   end
 
+  {'min'=>1,'max'=>-1}.each do |k,v|
+    define_method k + '_satisfying' do |versions,range|
+      s = Array.new
+      versions.each {|i| s << i if NodeSemver.satisfies(i,range) }
+      s.empty? ? nil : s.sort[v]
+    end
+  end
+
   class << self
     def valid(v)
       NodeSemver::Instance.new(v).valid
@@ -68,14 +76,6 @@ module NodeSemver
 
   def self.satisfies(version, range)
     NodeSemver::Satisfaction.new(version, range).satisfy
-  end
-
-  def self.max_satisfying(versions, range)
-    satisfied_versions = []
-    versions.each do |v|
-      satisfied_versions << v if NodeSemver.satisfies(v, range)
-    end
-    satisfied_versions.empty? ? nil : satisfied_versions.sort[-1]
   end
 
   def self.gtr(version, range)

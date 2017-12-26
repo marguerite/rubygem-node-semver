@@ -124,8 +124,8 @@ module NodeSemver
     end
 
     def parse_x(version)
-      # '1.2.*'
-      version = version.sub!(/X|\*/, 'x') || version
+      version = version.sub(/X|\*/, 'x')
+                       .gsub(/>|=|</, '')
       arr = version.split('.')
       low = fillup(version.sub('x', '0'))
       index = if version =~ /x/
